@@ -1,4 +1,6 @@
-export class ProductCatalog {
+ import { IProduct } from "../../../types";
+ 
+ export class ProductCatalog {
   private items: IProduct[] = [];
   private selectedProduct: IProduct | null = null;
 

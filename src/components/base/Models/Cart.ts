@@ -1,4 +1,6 @@
-class Cart {
+ import { IProduct } from "../../../types";
+ 
+ export class Cart {
   private items: IProduct[] = [];
 
   /**
