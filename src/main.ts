@@ -1,22 +1,24 @@
 import './scss/styles.scss';
-import { ProductCatalog } from '../src/components/base/models/ProductCatalog';
-import { Cart } from '../src/components/base/models/Cart';
-import { Buyer } from '../src/components/base/models/Buyer';
-//import { IProduct } from '../src/types/index'//
-import { apiProducts } from './utils/data';
+import { ProductCatalog } from './components/Models/ProductCatalog';
+import { Cart } from './components/Models/Cart';
+import { Buyer } from './components/Models/Buyer';
+import { CommunicationService } from './components/Models/CommunicationService';
+import { Api } from './components/base/Api';
+import { API_URL } from './utils/constants';
+
+
 
 // Экземпляр каталога товаров
-const productCatalog = new ProductCatalog(apiProducts.items);
+const productCatalog = new ProductCatalog();
 
 // Экземпляр корзины
 const cart = new Cart();
 
 // Экземпляр покупателя
-const buyer = new Buyer({
-  address: 'ул. Ленина, 15',
-  phone: '+7 (999) 123-45-67',
-  email: 'user@example.com'
-});
+const buyer = new Buyer();
+
+const api = new Api(API_URL);
+const communicationService = new CommunicationService(api);
 
 // Получаем все товары из каталога
 console.log('Все товары в каталоге:', productCatalog.getItems());
@@ -27,7 +29,7 @@ console.log('Товар с ID 1:', foundProduct);
 
 // Устанавливаем выбранный товар для подробного отображения
 if (foundProduct) {
-  productCatalog.setSelectedProduct(foundProduct);
+    productCatalog.setSelectedProduct(foundProduct);
 }
 
 // Получаем выбранный товар
@@ -37,11 +39,11 @@ console.log('\n=== ПРОВЕРКА КЛАССА Cart ===');
 
 // Добавляем товары в корзину
 if (foundProduct) {
-  cart.addItem(foundProduct);
+    cart.addItem(foundProduct);
 }
 const secondProduct = productCatalog.getItemById('2');
 if (secondProduct) {
-  cart.addItem(secondProduct);
+    cart.addItem(secondProduct);
 }
 
 // Получаем товары из корзины
@@ -58,7 +60,7 @@ console.log('Количество товаров в корзине:', cart.getIt
 
 // Удаляем один товар из корзины
 if (secondProduct) {
-  cart.removeItem(secondProduct);
+    cart.removeItem(secondProduct);
 }
 console.log('После удаления второго товара:', cart.getItems());
 console.log('Новая общая стоимость:', cart.getTotalPrice());
@@ -71,13 +73,19 @@ console.log('Данные покупателя:', buyer.getData());
 // Валидируем данные
 const validationErrors = buyer.validate();
 console.log('Ошибки валидации:', validationErrors);
-console.log('Все данные валидны?', buyer.isValid());
 
 // Добавляем вид оплаты
 buyer.setPayment('card');
 console.log('После добавления вида оплаты:', buyer.getData());
-console.log('Теперь все данные валидны?', buyer.isValid());
 
 // Очищаем данные покупателя
 buyer.clearData();
 console.log('После очистки данных:', buyer.getData());
+// === ПОЛУЧЕНИЕ ДАННЫХ С СЕРВЕРА И СОХРАНЕНИЕ В МОДЕЛИ КАТАЛОГА ===
+
+console.log('Загрузка товаров с сервера');
+communicationService.getProducts()
+    .then(productsResponse => {
+        // Сохраняем полученные товары в модель каталога
+        productCatalog.setItems(productsResponse.items)
+    });

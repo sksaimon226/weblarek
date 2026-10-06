@@ -30,4 +30,9 @@ export interface IProduct {
   price: number | null;
 }
 
+// Тип для ответа сервера при оформлении заказа
+export interface IOrderConfirmation {
+  orderId: string;
+  total: number;
+}
 

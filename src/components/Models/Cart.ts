@@ -1,4 +1,4 @@
- import { IProduct } from "../../../types";
+ import { IProduct } from "../../types";
  
  export class Cart {
   private items: IProduct[] = [];
@@ -8,7 +8,7 @@
    * @returns массив товаров
    */
   getItems(): IProduct[] {
-    return [...this.items]; // возвращаем копию массива
+    return this.items; // возвращаем копию массива
   }
 
   /**

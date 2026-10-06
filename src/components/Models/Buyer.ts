@@ -1,5 +1,5 @@
- import { IBuyer } from "../../../types";
- import { ValidationErrors } from "../../../types";
+ import { IBuyer } from "../../types";
+ import { ValidationErrors } from "../../types";
  
   export class Buyer {
   private data: IBuyer = {
@@ -91,8 +91,4 @@
    * Проверяет, все ли данные валидны
    * @returns true, если нет ошибок валидации
    */
-  isValid(): boolean {
-    const errors = this.validate();
-    return Object.keys(errors).length === 0;
-  }
 }
