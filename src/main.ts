@@ -74,10 +74,6 @@ console.log('Данные покупателя:', buyer.getData());
 const validationErrors = buyer.validate();
 console.log('Ошибки валидации:', validationErrors);
 
-// Добавляем вид оплаты
-buyer.setPayment('card');
-console.log('После добавления вида оплаты:', buyer.getData());
-
 // Очищаем данные покупателя
 buyer.clearData();
 console.log('После очистки данных:', buyer.getData());

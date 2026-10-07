@@ -21,26 +21,6 @@
   }
 
   /**
-   * Альтернативный вариант: отдельные методы для каждого поля
-   */
-
-  setPayment(payment: TPayment): void {
-    this.data.payment = payment;
-  }
-
-  setAddress(address: string): void {
-    this.data.address = address;
-  }
-
-  setPhone(phone: string): void {
-    this.data.phone = phone;
-  }
-
-  setEmail(email: string): void {
-    this.data.email = email;
-  }
-
-  /**
    * Возвращает все данные покупателя
    * @returns объект с данными покупателя
    */
