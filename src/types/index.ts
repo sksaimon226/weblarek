@@ -30,6 +30,12 @@ export interface IProduct {
   price: number | null;
 }
 
+// Тип для ответа сервера с товарами
+export interface IProductsResponse {
+  total: number;
+  items: IProduct[];
+}
+
 // Тип для ответа сервера при оформлении заказа
 export interface IOrderConfirmation {
   orderId: string;

@@ -1,12 +1,7 @@
 import { IApi } from '../../types';
 import { IProduct, IBuyer } from '../../types'
 import { IOrderConfirmation } from '../../types';
-
-// Тип для ответа сервера с товарами
-interface IProductsResponse {
-  items: IProduct[];
-}
-
+import { IProductsResponse } from '../../types';
 
 /**
  * Класс CommunicationService — слой коммуникации с сервером.
