@@ -84,4 +84,18 @@ communicationService.getProducts()
     .then(productsResponse => {
         // Сохраняем полученные товары в модель каталога
         productCatalog.setItems(productsResponse.items)
+        // ПРОВЕРКА: убеждаемся, что данные сохранились в каталоге
+        console.log('=== ПРОВЕРКА ДАННЫХ В КАТАЛОГЕ ===');
+
+        // 1. Выводим общее количество товаров
+        const catalogItems = productCatalog.getItems();
+        console.log('Количество товаров в каталоге после сохранения:', catalogItems.length);
+
+
+        // 2. Выводим первый товар для проверки структуры
+        if (catalogItems.length > 0) {
+            console.log('Первый товар в каталоге:', catalogItems[0]);
+        }
+    }).catch((error: Error) => {
+        console.error('Ошибка при загрузке товаров с сервера:', error);
     });

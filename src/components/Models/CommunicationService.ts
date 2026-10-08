@@ -1,8 +1,7 @@
 import { IApi } from '../../types';
-import { IProduct, IBuyer } from '../../types'
 import { IOrderConfirmation } from '../../types';
 import { IProductsResponse } from '../../types';
-
+import { IOrderRequest } from '../../types';
 /**
  * Класс CommunicationService — слой коммуникации с сервером.
  * Использует композицию: зависит от объекта, реализующего интерфейс IApi.
@@ -35,22 +34,9 @@ class CommunicationService {
    * @returns Promise<IOrderConfirmation> — объект, подтверждающий покупку
    * с указанием ID заказа и общей суммы
    */
-  sendOrder(
-    buyer: IBuyer,
-    cartItems: IProduct[]
-  ): Promise<IOrderConfirmation> {
-    return this.api.post<IOrderConfirmation>('/order/', {
-      payment: buyer.payment,
-      address: buyer.address,
-      phone: buyer.phone,
-      email: buyer.email,
-      items: cartItems.map(item => ({
-        id: item.id,
-        title: item.title,
-        price: item.price ?? 0
-      }))
-    });
-  }
+  sendOrder(orderData: IOrderRequest): Promise<IOrderConfirmation> {
+  return this.api.post<IOrderConfirmation>('/order/', orderData);
+}
 }
 
 export { CommunicationService };

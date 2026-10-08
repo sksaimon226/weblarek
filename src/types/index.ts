@@ -42,3 +42,15 @@ export interface IOrderConfirmation {
   total: number;
 }
 
+// Интерфейс для данных, отправляемых на сервер при оформлении заказа
+export interface IOrderRequest {
+  payment: string;
+  address: string;
+  phone: string;
+  email: string;
+  items: Array<{
+    id: string;
+    title: string;
+    price: number;
+  }>;
+}
