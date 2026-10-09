@@ -5,11 +5,21 @@ import { Buyer } from './components/Models/Buyer';
 import { CommunicationService } from './components/Models/CommunicationService';
 import { Api } from './components/base/Api';
 import { API_URL } from './utils/constants';
+import { apiProducts } from './utils/data';
 
 
 
 // Экземпляр каталога товаров
 const productCatalog = new ProductCatalog();
+console.log('Тестируем модель каталога товаров');
+
+productCatalog.setItems(apiProducts.items);
+// тут кладем моковые данные в каталог
+console.log('Все товары:', productCatalog.getItems());
+// проверяем что все попало в каталог
+
+console.log('Товар по id:', productCatalog.getItems(apiProducts.items[0].id));
+// проверяем что можно получить товар
 
 // Экземпляр корзины
 const cart = new Cart();
@@ -20,13 +30,12 @@ const buyer = new Buyer();
 const api = new Api(API_URL);
 const communicationService = new CommunicationService(api);
 
-// Получаем все товары из каталога
-console.log('Все товары в каталоге:', productCatalog.getItems());
 
 // Находим товар по ID
-const foundProduct = productCatalog.getItemById('1');
-console.log('Товар с ID 1:', foundProduct);
+const testProductId = '854cef69-976d-4c2a-a18c-2aa45046c390';
+const foundProduct = productCatalog.getItemById(testProductId);
 
+console.log(`Товар с ID ${testProductId}:`, foundProduct);
 // Устанавливаем выбранный товар для подробного отображения
 if (foundProduct) {
     productCatalog.setSelectedProduct(foundProduct);
