@@ -7,13 +7,16 @@ import { Api } from './components/base/Api';
 import { API_URL } from './utils/constants';
 import { apiProducts } from './utils/data';
 
-
+const productCatalog = new ProductCatalog();
+const cart = new Cart();
+const [product1, product2, product3] = productCatalog.getItems();
+const buyer = new Buyer();
+const api = new Api(API_URL);
+const communicationService = new CommunicationService(api);
 
 // Экземпляр каталога товаров
 console.log('\n=== ПРОВЕРКА КЛАССА ProductCatalog ===');
-const productCatalog = new ProductCatalog();
 console.log('Тестируем модель каталога товаров');
-
 productCatalog.setItems(apiProducts.items);
 // тут кладем моковые данные в каталог
 console.log('Все товары:', productCatalog.getItems());
@@ -30,8 +33,6 @@ console.log('Каталог: товар для просмотра после в�
 
 // Экземпляр корзины
 console.log('\n=== ПРОВЕРКА КЛАССА Cart ===');
-const cart = new Cart();
-const [product1, product2, product3] = productCatalog.getItems();
 cart.addItem(product1);
 cart.addItem(product2);
 cart.addItem(product3); // товар без цены
@@ -53,19 +54,14 @@ console.log('Корзина: количество после очистки', ca
 
 // Экземпляр покупателя
 console.log('\n=== ПРОВЕРКА КЛАССА Buyer ===');
-const buyer = new Buyer();
-
 console.log('Покупатель: ошибки пустой формы', buyer.validate());
-
 buyer.setData({ payment: 'card' });
 buyer.setData({ address: 'г. Москва, ул. Пушкина, д. 1' });
 console.log('Покупатель: данные после ввода оплаты и адреса', buyer.getData());
 console.log('Покупатель: ошибки после первого шага', buyer.validate());
-
 buyer.setData({ email: 'test@test.ru', phone: '+7 999 123-45-67' });
 console.log('Покупатель: все данные', buyer.getData());
 console.log('Покупатель: ошибки заполненной формы', buyer.validate());
-
 buyer.clearData();
 console.log('Покупатель: данные после очистки', buyer.getData());
 // Валидируем данные
@@ -73,9 +69,6 @@ const validationErrors = buyer.validate();
 console.log('Ошибки валидации:', validationErrors);
 
 
-const api = new Api(API_URL);
-const communicationService = new CommunicationService(api);
-// === ПОЛУЧЕНИЕ ДАННЫХ С СЕРВЕРА И СОХРАНЕНИЕ В МОДЕЛИ КАТАЛОГА ===
 
 console.log('Загрузка товаров с сервера');
 communicationService.getProducts()
