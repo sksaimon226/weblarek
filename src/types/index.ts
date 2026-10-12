@@ -38,19 +38,12 @@ export interface IProductsResponse {
 
 // Тип для ответа сервера при оформлении заказа
 export interface IOrderConfirmation {
-  orderId: string;
+  Id: string;
   total: number;
 }
 
 // Интерфейс для данных, отправляемых на сервер при оформлении заказа
-export interface IOrderRequest {
-  payment: string;
-  address: string;
-  phone: string;
-  email: string;
-  items: Array<{
-    id: string;
-    title: string;
-    price: number;
-  }>;
+export interface IOrderRequest extends IBuyer {
+    total: number;
+    items: string[];
 }

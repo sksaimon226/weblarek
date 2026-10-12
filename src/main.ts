@@ -10,6 +10,7 @@ import { apiProducts } from './utils/data';
 
 
 // Экземпляр каталога товаров
+console.log('\n=== ПРОВЕРКА КЛАССА ProductCatalog ===');
 const productCatalog = new ProductCatalog();
 console.log('Тестируем модель каталога товаров');
 
@@ -17,75 +18,63 @@ productCatalog.setItems(apiProducts.items);
 // тут кладем моковые данные в каталог
 console.log('Все товары:', productCatalog.getItems());
 // проверяем что все попало в каталог
+const firstProduct = productCatalog.getItems()[0];
+console.log('Каталог: товар по id', productCatalog.getItem(firstProduct.id));
+console.log('Каталог: товар по несуществующему id', productCatalog.getItem('no-such-id'));
 
-console.log('Товар по id:', productCatalog.getItems(apiProducts.items[0].id));
+console.log('Каталог: товар для просмотра до выбора', productCatalog.getSelectedProduct());
+productCatalog.setSelectedProduct(firstProduct);
+console.log('Каталог: товар для просмотра после выбора', productCatalog.getSelectedProduct());
 // проверяем что можно получить товар
 
+
 // Экземпляр корзины
+console.log('\n=== ПРОВЕРКА КЛАССА Cart ===');
 const cart = new Cart();
+const [product1, product2, product3] = productCatalog.getItems();
+cart.addItem(product1);
+cart.addItem(product2);
+cart.addItem(product3); // товар без цены
+cart.addItem(product1); // повторно — не должен добавиться
+console.log('Корзина: товары после добавления', cart.getItems());
+console.log('Корзина: количество товаров', cart.getItemCount());
+console.log('Корзина: общая стоимость', cart.getTotalPrice());
+console.log('Корзина: есть ли товар 1', cart.hasItem(product1.id));
+
+cart.removeItem(product1);
+console.log('Корзина: товары после удаления товара 1', cart.getItems());
+console.log('Корзина: есть ли товар 1 после удаления', cart.hasItem(product1.id));
+console.log('Корзина: стоимость после удаления', cart.getTotalPrice());
+
+cart.clear();
+console.log('Корзина: товары после очистки', cart.getItems());
+console.log('Корзина: количество после очистки', cart.getItemCount());
+
 
 // Экземпляр покупателя
+console.log('\n=== ПРОВЕРКА КЛАССА Buyer ===');
 const buyer = new Buyer();
 
-const api = new Api(API_URL);
-const communicationService = new CommunicationService(api);
+console.log('Покупатель: ошибки пустой формы', buyer.validate());
 
+buyer.setData({ payment: 'card' });
+buyer.setData({ address: 'г. Москва, ул. Пушкина, д. 1' });
+console.log('Покупатель: данные после ввода оплаты и адреса', buyer.getData());
+console.log('Покупатель: ошибки после первого шага', buyer.validate());
 
-// Находим товар по ID
-const testProductId = '854cef69-976d-4c2a-a18c-2aa45046c390';
-const foundProduct = productCatalog.getItemById(testProductId);
+buyer.setData({ email: 'test@test.ru', phone: '+7 999 123-45-67' });
+console.log('Покупатель: все данные', buyer.getData());
+console.log('Покупатель: ошибки заполненной формы', buyer.validate());
 
-console.log(`Товар с ID ${testProductId}:`, foundProduct);
-// Устанавливаем выбранный товар для подробного отображения
-if (foundProduct) {
-    productCatalog.setSelectedProduct(foundProduct);
-}
-
-// Получаем выбранный товар
-console.log('Выбранный товар:', productCatalog.getSelectedProduct());
-
-console.log('\n=== ПРОВЕРКА КЛАССА Cart ===');
-
-// Добавляем товары в корзину
-if (foundProduct) {
-    cart.addItem(foundProduct);
-}
-const secondProduct = productCatalog.getItemById('2');
-if (secondProduct) {
-    cart.addItem(secondProduct);
-}
-
-// Получаем товары из корзины
-console.log('Товары в корзине:', cart.getItems());
-
-// Проверяем наличие товара в корзине
-console.log('Есть товар с ID 1 в корзине?', cart.hasItem('1'));
-
-// Получаем общую стоимость
-console.log('Общая стоимость товаров в корзине:', cart.getTotalPrice());
-
-// Получаем количество товаров
-console.log('Количество товаров в корзине:', cart.getItemCount());
-
-// Удаляем один товар из корзины
-if (secondProduct) {
-    cart.removeItem(secondProduct);
-}
-console.log('После удаления второго товара:', cart.getItems());
-console.log('Новая общая стоимость:', cart.getTotalPrice());
-
-console.log('\n=== ПРОВЕРКА КЛАССА Buyer ===');
-
-// Получаем данные покупателя
-console.log('Данные покупателя:', buyer.getData());
-
+buyer.clearData();
+console.log('Покупатель: данные после очистки', buyer.getData());
 // Валидируем данные
 const validationErrors = buyer.validate();
 console.log('Ошибки валидации:', validationErrors);
 
-// Очищаем данные покупателя
-buyer.clearData();
-console.log('После очистки данных:', buyer.getData());
+
+const api = new Api(API_URL);
+const communicationService = new CommunicationService(api);
 // === ПОЛУЧЕНИЕ ДАННЫХ С СЕРВЕРА И СОХРАНЕНИЕ В МОДЕЛИ КАТАЛОГА ===
 
 console.log('Загрузка товаров с сервера');
@@ -108,3 +97,4 @@ communicationService.getProducts()
     }).catch((error: Error) => {
         console.error('Ошибка при загрузке товаров с сервера:', error);
     });
+
