@@ -7,14 +7,9 @@ import { Api } from './components/base/Api';
 import { API_URL } from './utils/constants';
 import { apiProducts } from './utils/data';
 
-const productCatalog = new ProductCatalog();
-const cart = new Cart();
-const [product1, product2, product3] = productCatalog.getItems();
-const buyer = new Buyer();
-const api = new Api(API_URL);
-const communicationService = new CommunicationService(api);
 
 // Экземпляр каталога товаров
+const productCatalog = new ProductCatalog();
 console.log('\n=== ПРОВЕРКА КЛАССА ProductCatalog ===');
 console.log('Тестируем модель каталога товаров');
 productCatalog.setItems(apiProducts.items);
@@ -32,6 +27,8 @@ console.log('Каталог: товар для просмотра после в�
 
 
 // Экземпляр корзины
+const cart = new Cart();
+const [product1, product2, product3] = productCatalog.getItems();
 console.log('\n=== ПРОВЕРКА КЛАССА Cart ===');
 cart.addItem(product1);
 cart.addItem(product2);
@@ -53,6 +50,7 @@ console.log('Корзина: количество после очистки', ca
 
 
 // Экземпляр покупателя
+const buyer = new Buyer();
 console.log('\n=== ПРОВЕРКА КЛАССА Buyer ===');
 console.log('Покупатель: ошибки пустой формы', buyer.validate());
 buyer.setData({ payment: 'card' });
@@ -69,7 +67,8 @@ const validationErrors = buyer.validate();
 console.log('Ошибки валидации:', validationErrors);
 
 
-
+const api = new Api(API_URL);
+const communicationService = new CommunicationService(api);
 console.log('Загрузка товаров с сервера');
 communicationService.getProducts()
     .then(productsResponse => {
