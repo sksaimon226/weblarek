@@ -17,6 +17,10 @@ export const categoryMap = {
 };
 
 export const settings = {
-
+  modalActiveClass: 'modal_active',
+  paymentActiveClass: 'button_alt-active',
+  Synapses: 'синапсов',
+  CheckMark: 'Списано',
+  priceless: 'Бесценно'
 };
 

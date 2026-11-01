@@ -5,7 +5,7 @@ export interface IApi {
     post<T extends object>(uri: string, data: object, method?: ApiPostMethods): Promise<T>;
 }
 
-type TPayment = 'card' | 'cash';
+export type TPayment = 'card' | 'cash';
 
 export interface IBuyer {
   payment: TPayment | null;
@@ -46,4 +46,45 @@ export interface IOrderConfirmation {
 export interface IOrderRequest extends IBuyer {
     total: number;
     items: string[];
+}
+
+export interface IHeader {
+    counter: number;
+}
+
+export interface IGallery {
+    catalog: HTMLElement[];
+}
+
+export interface IModal {
+    content: HTMLElement;
+}
+
+export interface ICardActions {
+    onClick: (event: MouseEvent) => void;
+}
+
+export type TBaseCard = Pick<IProduct, 'title' | 'price'>;
+export type TCatalogCardView = TBaseCard & Pick<IProduct, 'image' | 'category'>;
+
+export type TModelCardView = TCatalogCardView & Pick<IProduct, 'description'> & {
+    buttonText: string;
+    buttonDisabled: boolean;
+};
+
+export type TCartCardView = TBaseCard & {
+    index: number;
+};
+
+export interface IBaseForm {
+    valid: boolean;
+    errors: string;
+}
+
+export type TCheckoutStep1FormView = IBaseForm & Pick<IBuyer, 'payment' | 'address'>;
+export type TFormMod = Partial<IBuyer>;
+export type TCheckoutStep2FormView = IBaseForm & Pick<IBuyer, 'email' | 'phone'>;
+
+export interface ICheckMark {
+    total: number;
 }

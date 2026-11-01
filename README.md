@@ -234,3 +234,150 @@ Presenter - презентер содержит основную логику п
 Метод:
 `sendOrder(buyer: IBuyer, cartItems: IProduct[]): Promise<IOrderResponse>` - отправляет данные о заказе на сервер через POST‑запрос.
 ` getProducts(): Promise<IProductsResponse>` - Получает массив товаров с сервера, выполняет GET‑запрос на эндпоинт /product/
+
+###### Классы слоя View 
+
+###### Класс Header 
+Конструктор:
+`constructor(events: IEvents, container: HTMLElement)` — принимает брокер событий и DOM-элемент шапки .header.
+
+Поля класса:
+`basketButton: HTMLButtonElement` — кнопка открытия корзины.
+`counterElement: HTMLElement` — элемент счётчика товаров.
+
+Методы класса:
+`set counter(value: number)` — выводит количество товаров в корзине.
+
+###### Класс Gallery
+Конструктор:
+`constructor(container: HTMLElement)` — принимает DOM-элемент каталога .gallery.
+
+Методы класса:
+`set catalog(items: HTMLElement[])` — выводит переданные карточки товаров.
+
+###### Класс Modal
+Конструктор:
+`constructor(events: IEvents, container: HTMLElement)` — принимает брокер событий и DOM-элемент модального окна .modal.
+
+Поля класса:
+`closeButton: HTMLButtonElement` — кнопка закрытия.
+`contentElement: HTMLElement` — контейнер для содержимого.
+
+Методы класса:
+`set content(value: HTMLElement)` — выводит переданное содержимое.
+`open(): void` — показывает модальное окно, добавляя модификатор modal_active.
+`close(): void` — скрывает модальное окно, удаляя модификатор modal_active.
+
+###### Родительский класс BaseCardView
+Базовый класс для всех типов карточек товара. Содержит общий функционал, который наследуется дочерними классами.
+
+Конструктор:
+`constructor(container: HTMLElement)` — принимает DOM-элемент карточки.
+
+Поля класса:
+`titleElement: HTMLElement` — название товара.
+`priceElement: HTMLElement` — цена товара.
+
+Методы класса:
+`set title(value: string)` — выводит название товара.
+`set price(value: number | null)` — выводит цену товара в синапсах; если цены нет, выводит «Бесценно».
+
+###### Дочерний класс CatalogCardView
+Отображает сокращённую информацию о товаре в каталоге (название, изображение, цена, кнопка «Купить»/«В корзине»)
+
+Поля класса:
+`categoryElement: HTMLElement` — категория товара.
+`imageElement: HTMLImageElement` — изображение товара.
+
+Методы класса:
+`set category(value: string)` — выводит категорию и устанавливает модификатор фона из categoryMap.
+`set image(value: string)` — выводит изображение товара.
+
+###### Дочерний класс ModalCardView (карточка в модальном окне)
+Отображает полную информацию о товаре в модальном окне (описание, характеристики, цена, кнопка «Купить»/«Удалить из корзины»).
+
+Наследует: BaseCardView.
+Конструктор:
+`constructor(events: IEvents, container: HTMLElement)` — принимает брокер событий и DOM-элемент из шаблона #card-preview
+
+Поля класса:
+`categoryElement: HTMLElement` — категория товара.
+`imageElement: HTMLImageElement` — изображение товара.
+`descriptionElement: HTMLElement` — описание товара.
+`buttonElement: HTMLButtonElement` — кнопка покупки или удаления товара.
+
+Методы класса:
+`set category(value: string)` — выводит категорию и устанавливает модификатор фона из categoryMap.
+`set image(value: string)` — выводит изображение товара.
+`set description(value: string)` — выводит описание товара.
+`set buttonText(value: string)` — выводит текст кнопки («Купить», «Удалить из корзины» или «Недоступно»).
+`set buttonDisabled(value: boolean)` — блокирует или разблокирует кнопку.
+
+###### Дочерний класс CartCardView (карточка товара в корзине)
+тображает товар в списке корзины (название, цена, количество, кнопка удаления).
+
+Наследует: BaseCardView.
+Конструктор:
+`constructor(container: HTMLElement, actions?: ICardActions)` — принимает DOM-элемент из шаблона #card-basket и обработчик нажатия на кнопку удаления.
+
+Поля класса:
+`indexElement: HTMLElement` — порядковый номер товара в корзине.
+`deleteButton: HTMLButtonElement` — кнопка удаления товара.
+
+Методы класса:
+`set index(value: number)` — выводит порядковый номер товара.
+
+###### Родительский класс: BaseFormView
+Базовый класс для всех форм. Содержит общий функционал, который наследуется дочерними классами.
+
+Конструктор:
+`constructor(events: IEvents, container: HTMLFormElement)` — принимает брокер событий и DOM-элемент формы.
+
+Поля класса:
+`submitButton: HTMLButtonElement` — кнопка отправки формы.
+`errorsElement: HTMLElement` — элемент для вывода ошибок.
+
+Методы класса:
+`set valid(value: boolean)` — разблокирует кнопку отправки, если true, и блокирует, если false.
+`set errors(value: string)` — выводит текст ошибок.
+
+###### Дочерний класс 1: CheckoutStep1FormView (форма первого шага оформления заказа)
+Отображает форму выбора способа оплаты и ввода адреса доставки.
+
+Наследует: `BaseFormView.`
+
+
+Метод `validate()` переопределён для проверки:
+выбран ли способ оплаты;
+заполнено ли поле адреса.
+Кнопка «Далее» активируется/деактивируется в зависимости от результата валидации.
+При успешной отправке эмитится событие `checkout:step1:submit`.
+События:
+
+`checkout:step1:submit`— эмитится при нажатии на кнопку «Далее» и успешной валидации. В данных передаётся `{ values: getValues(), step: 1 }`.
+
+###### Дочерний класс 2: CheckoutStep2FormView (форма второго шага оформления заказа)
+Отображает форму ввода контактных данных (почта, телефон).
+
+Наследует: BaseFormView.
+Метод `validate()` переопределён для проверки:
+заполненности поля email;
+корректности формата телефона (базовая валидация).
+Кнопка «Оплатить» активируется только при валидности формы.
+При успешной отправке эмитится событие `checkout:step2:submit`.
+События:
+
+`checkout:step2:submit` — эмитится при нажатии на кнопку «Оплатить» и успешной валидации. В данных передаётся { values: getValues(), step: 2 }.
+
+###### Класс PayCheckmark
+ успешная оплата заказа
+
+ Конструктор:
+`constructor(events: IEvents, container: HTMLElement)` — принимает брокер событий и DOM-элемент из шаблона #success.
+
+Поля класса:
+`descriptionElement: HTMLElement` — текст со списанной суммой.
+`closeButton: HTMLButtonElement` — кнопка закрытия.
+
+Методы класса:
+`set total(value: number)` — выводит списанную сумму.
