@@ -1,10 +1,10 @@
 import { BaseFormView } from './BaseFormView';
 import { IEvents } from '../base/Events';
-import { TCheckoutStep2FormView, TFormMod } from '../../types';
+import { TContactFormView, TFormMod } from '../../types';
 import { ensureElement } from '../../utils/utils';
 
 
-export class CheckoutStep2FormView extends BaseFormView<TCheckoutStep2FormView> {
+export class ContactFormView extends BaseFormView<TContactFormView> {
     protected emailInput: HTMLInputElement;
     protected phoneInput: HTMLInputElement;
 

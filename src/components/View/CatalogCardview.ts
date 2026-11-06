@@ -21,10 +21,6 @@ export class CatalogCardView extends BaseCardView<TCatalogCardView> {
     }
   }
 
-  render(): HTMLElement {
-    return this.container;
-  }
-
   set category(value: string) {
         this.categoryElement.textContent = value;
         for (const [name, modifier] of Object.entries(categoryMap)) {

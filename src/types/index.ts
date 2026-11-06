@@ -22,13 +22,14 @@ export interface ValidationErrors {
 }
 
 export interface IProduct {
-  id: string;
-  description: string;
-  image: string;
-  title: string;
-  category: string;
-  price: number | null;
+    id: string;
+    description: string;
+    image: string;
+    title: string;
+    category: string;
+    price: number | null;
 }
+
 
 // Тип для ответа сервера с товарами
 export interface IProductsResponse {
@@ -81,10 +82,16 @@ export interface IBaseForm {
     errors: string;
 }
 
-export type TCheckoutStep1FormView = IBaseForm & Pick<IBuyer, 'payment' | 'address'>;
+export type TOrderFormView = IBaseForm & Pick<IBuyer, 'payment' | 'address'>;
 export type TFormMod = Partial<IBuyer>;
-export type TCheckoutStep2FormView = IBaseForm & Pick<IBuyer, 'email' | 'phone'>;
+export type TContactFormView = IBaseForm & Pick<IBuyer, 'email' | 'phone'>;
 
 export interface ICheckMark {
     total: number;
+}
+
+export interface ICart {
+    items: HTMLElement[];
+    total: number;
+    buttonDisabled: boolean;
 }

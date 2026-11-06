@@ -1,7 +1,7 @@
  import { IBuyer } from "../../types";
  import { ValidationErrors } from "../../types";
  
-  export class Buyer {
+  export class BuyerModel {
   private data: IBuyer = {
     payment: null,
     address: '',

@@ -1,13 +1,13 @@
 import { BaseFormView } from './BaseFormView';
 import { IEvents } from '../base/Events';
-import { TFormMod, TCheckoutStep1FormView, TPayment } from '../../types';
+import { TFormMod, TOrderFormView, TPayment } from '../../types';
 import { ensureElement } from '../../utils/utils';
 import { settings } from '../../utils/constants';
 
 /**
  * Первый шаг оформления: способ оплаты и адрес доставки
  */
-export class CheckoutStep1FormView extends BaseFormView<TCheckoutStep1FormView> {
+export class OrderFormView extends BaseFormView<TOrderFormView> {
     protected cardButton: HTMLButtonElement;
     protected cashButton: HTMLButtonElement;
     protected addressInput: HTMLInputElement;

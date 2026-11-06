@@ -1,92 +1,165 @@
 import './scss/styles.scss';
 import { ProductCatalog } from './components/Models/ProductCatalog';
-import { Cart } from './components/Models/Cart';
-import { Buyer } from './components/Models/Buyer';
+import { CartModel } from './components/Models/CartModel';
+import { BuyerModel } from './components/Models/BuyerModel';
 import { CommunicationService } from './components/Models/CommunicationService';
 import { Api } from './components/base/Api';
-import { API_URL } from './utils/constants';
-import { apiProducts } from './utils/data';
+import { API_URL, settings } from './utils/constants';
+import { cloneTemplate, ensureElement } from './utils/utils';
+import { EventEmitter } from './components/base/Events';
+import { ICart, IOrderRequest, IProduct, TContactFormView, TFormMod, TOrderFormView } from './types';
+import { Header } from './components/View/Header';
+import { Gallery } from './components/View/Gallery';
+import { Modal } from './components/View/Modal';
+import { CatalogCardView } from './components/View/CatalogCardview';
+import { ModalCardView } from './components/View/ModalCardView';
+import {CartCardView} from './components/View/CartCardView';
+import { Cart} from './components/View/Cart';
+import { OrderFormView } from './components/View/OrderFormView';
+import { ContactFormView } from './components/View/ContactFormView';
+import { PayCheckMark } from './components/View/PayCheckMark';
 
+// Шаблоны 
+const CatalogCardTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
+const ModalCardTemplate = ensureElement<HTMLTemplateElement>('#card-preview');
+const CartCardTemplate = ensureElement<HTMLTemplateElement>('#card-basket');
+const CartTemplate = ensureElement<HTMLTemplateElement>('#basket');
+const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
+const contactTemplate = ensureElement<HTMLTemplateElement>('#contacts');
+const CheckMarkTemplate = ensureElement<HTMLTemplateElement>('#success');
 
-// Экземпляр каталога товаров
-const productCatalog = new ProductCatalog();
-console.log('\n=== ПРОВЕРКА КЛАССА ProductCatalog ===');
-console.log('Тестируем модель каталога товаров');
-productCatalog.setItems(apiProducts.items);
-// тут кладем моковые данные в каталог
-console.log('Все товары:', productCatalog.getItems());
-// проверяем что все попало в каталог
-const firstProduct = productCatalog.getItems()[0];
-console.log('Каталог: товар по id', productCatalog.getItem(firstProduct.id));
-console.log('Каталог: товар по несуществующему id', productCatalog.getItem('no-such-id'));
-
-console.log('Каталог: товар для просмотра до выбора', productCatalog.getSelectedProduct());
-productCatalog.setSelectedProduct(firstProduct);
-console.log('Каталог: товар для просмотра после выбора', productCatalog.getSelectedProduct());
-// проверяем что можно получить товар
-
-
-// Экземпляр корзины
-const cart = new Cart();
-const [product1, product2, product3] = productCatalog.getItems();
-console.log('\n=== ПРОВЕРКА КЛАССА Cart ===');
-cart.addItem(product1);
-cart.addItem(product2);
-cart.addItem(product3); // товар без цены
-cart.addItem(product1); // повторно — не должен добавиться
-console.log('Корзина: товары после добавления', cart.getItems());
-console.log('Корзина: количество товаров', cart.getItemCount());
-console.log('Корзина: общая стоимость', cart.getTotalPrice());
-console.log('Корзина: есть ли товар 1', cart.hasItem(product1.id));
-
-cart.removeItem(product1);
-console.log('Корзина: товары после удаления товара 1', cart.getItems());
-console.log('Корзина: есть ли товар 1 после удаления', cart.hasItem(product1.id));
-console.log('Корзина: стоимость после удаления', cart.getTotalPrice());
-
-cart.clear();
-console.log('Корзина: товары после очистки', cart.getItems());
-console.log('Корзина: количество после очистки', cart.getItemCount());
-
-
-// Экземпляр покупателя
-const buyer = new Buyer();
-console.log('\n=== ПРОВЕРКА КЛАССА Buyer ===');
-console.log('Покупатель: ошибки пустой формы', buyer.validate());
-buyer.setData({ payment: 'card' });
-buyer.setData({ address: 'г. Москва, ул. Пушкина, д. 1' });
-console.log('Покупатель: данные после ввода оплаты и адреса', buyer.getData());
-console.log('Покупатель: ошибки после первого шага', buyer.validate());
-buyer.setData({ email: 'test@test.ru', phone: '+7 999 123-45-67' });
-console.log('Покупатель: все данные', buyer.getData());
-console.log('Покупатель: ошибки заполненной формы', buyer.validate());
-buyer.clearData();
-console.log('Покупатель: данные после очистки', buyer.getData());
-// Валидируем данные
-const validationErrors = buyer.validate();
-console.log('Ошибки валидации:', validationErrors);
-
-
+// ---------- Брокер событий, API и модели данных ----------
+const events = new EventEmitter();
 const api = new Api(API_URL);
-const communicationService = new CommunicationService(api);
-console.log('Загрузка товаров с сервера');
-communicationService.getProducts()
-    .then(productsResponse => {
-        // Сохраняем полученные товары в модель каталога
-        productCatalog.setItems(productsResponse.items)
-        // ПРОВЕРКА: убеждаемся, что данные сохранились в каталоге
-        console.log('=== ПРОВЕРКА ДАННЫХ В КАТАЛОГЕ ===');
+const webLarekApi = new CommunicationService(api);
+const productCatalog = new ProductCatalog(events);
+const cartmodel = new CartModel(events);
+const buyerModel = new BuyerModel(events);
 
-        // 1. Выводим общее количество товаров
-        const catalogItems = productCatalog.getItems();
-        console.log('Количество товаров в каталоге после сохранения:', catalogItems.length);
+// ---------- Компоненты представления ----------
+const header = new Header(events, ensureElement<HTMLElement>('.header'));
+const gallery = new Gallery(ensureElement<HTMLElement>('.gallery'));
+const modal = new Modal(events, ensureElement<HTMLElement>('#modal-container'));
+const cardPreview = new ModalCardView(events, cloneTemplate(ModalCardTemplate));
+const basketView = new Cart(events, cloneTemplate(CartTemplate));
+const orderForm = new OrderFormView(events, cloneTemplate<HTMLFormElement>(orderTemplate));
+const contactsForm = new ContactFormView(events, cloneTemplate<HTMLFormElement>(contactTemplate));
+const success = new PayCheckMark(events, cloneTemplate(CheckMarkTemplate));
 
+// Карточки товаров в корзине
+function getBasketCards(): HTMLElement[] {
+    return cartmodel.getItems().map((item, index) => {
+        const card = new CartCardView(cloneTemplate(CartCardTemplate), {
+            onClick: () => events.emit('basket-item:delete-click', item),
+        });
+        return card.render({ title: item.title, price: item.price, index: index + 1 });
+    });
+}
 
-        // 2. Выводим первый товар для проверки структуры
-        if (catalogItems.length > 0) {
-            console.log('Первый товар в каталоге:', catalogItems[0]);
-        }
-    }).catch((error: Error) => {
-        console.error('Ошибка при загрузке товаров с сервера:', error);
+// Данные для отрисовки корзины
+function getBasketData(): ICart {
+    return {
+        items: getBasketCards(),
+        total: cartmodel.getTotalPrice(),
+        buttonDisabled: cartmodel.getItemCount() === 0,
+    };
+}
+
+// Данные для формы способа оплаты и адреса
+function getOrderFormData(): TOrderFormView {
+    const { payment, address } = buyerModel.getData();
+    const errors = buyerModel.validate();
+    return {
+        payment,
+        address,
+        valid: !errors.payment && !errors.address,
+        errors: [errors.payment, errors.address].filter(Boolean).join(settings.errorsSeparator),
+    };
+}
+
+// Данные для формы почты и телефона
+function getContactsFormData(): TContactFormView {
+    const { email, phone } = buyerModel.getData();
+    const errors = buyerModel.validate();
+    return {
+        email,
+        phone,
+        valid: !errors.email && !errors.phone,
+        errors: [errors.email, errors.phone].filter(Boolean).join(settings.errorsSeparator),
+    };
+}
+
+// Изменился каталог: выводим карточки на главной странице
+events.on('catalog:changed', () => {
+    const cards = productCatalog.getItems().map((item) => {
+        const card = new CatalogCardView(cloneTemplate(CatalogCardTemplate), {
+            onClick: () => events.emit('card:select', item),
+        });
+        return card.render({
+            title: item.title,
+            price: item.price,
+            image: item.image,
+            category: item.category,
+        });
     });
 
+    gallery.render({ catalog: cards });
+});
+
+// Изменился товар для просмотра: открываем его в модальном окне
+events.on('preview:changed', () => {
+    const product = productCatalog.getSelectedProduct();
+    if (!product) return;
+
+    let buttonText = settings.buyButtonText;
+    if (product.price === null) {
+        buttonText = settings.unavailableButtonText;
+    } else if (cartmodel.hasItem(product.id)) {
+        buttonText = settings.removeButtonText;
+    }
+
+    modal.render({
+        content: cardPreview.render({
+            title: product.title,
+            price: product.price,
+            image: product.image,
+            category: product.category,
+            description: product.description,
+            buttonText,
+            buttonDisabled: product.price === null,
+        }),
+    });
+    modal.open();
+});
+
+// Изменилась корзина: обновляем счётчик в шапке и содержимое корзины
+events.on('basket:changed', () => {
+    header.render({ counter: cartmodel.getItemCount() });
+    basketView.render(getBasketData());
+});
+
+// Изменились данные покупателя: обновляем формы и ошибки валидации
+events.on('buyer:changed', () => {
+    orderForm.render(getOrderFormData());
+    contactsForm.render(getContactsFormData());
+});
+
+// ---------- События представлений ----------
+
+// Выбрана карточка в каталоге
+events.on('card:select', (product: IProduct) => {
+    productCatalog.setSelectedProduct(product);
+});
+
+// Нажата кнопка в карточке подробного просмотра: добавляем или удаляем товар
+events.on('preview:button-click', () => {
+    const product = productCatalog.getSelectedProduct();
+    if (!product) return;
+
+    if (cartmodel.hasItem(product.id)) {
+        cartmodel.removeItem(product);
+    } else {
+        cartmodel.addItem(product);
+    }
+    modal.close();
+});

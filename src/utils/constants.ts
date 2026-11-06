@@ -21,6 +21,10 @@ export const settings = {
   paymentActiveClass: 'button_alt-active',
   Synapses: 'синапсов',
   CheckMark: 'Списано',
-  priceless: 'Бесценно'
+  priceless: 'Бесценно',
+  errorsSeparator: '; ',
+  buyButtonText: 'Купить',
+  unavailableButtonText: 'Недоступно',
+  removeButtonText: 'Удалить из корзины',
 };
 
