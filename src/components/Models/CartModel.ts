@@ -18,6 +18,7 @@ constructor(protected events: IEvents) {}
    */
   addItem(product: IProduct): void {
     this.items.push(product);
+    this.events.emit('basket:changed');
   }
 
   /**
@@ -28,6 +29,7 @@ constructor(protected events: IEvents) {}
     const index = this.items.findIndex(item => item.id === product.id);
     if (index !== -1) {
       this.items.splice(index, 1);
+      this.events.emit('basket:changed');
     }
   }
 
@@ -36,6 +38,7 @@ constructor(protected events: IEvents) {}
    */
   clear(): void {
     this.items = [];
+    this.events.emit('basket:changed');
   }
 
   /**

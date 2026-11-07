@@ -19,6 +19,7 @@
       ...this.data,
       ...partialData
     };
+    this.events.emit('buyer:changed');
   }
 
   /**
@@ -39,6 +40,7 @@
       phone: '',
       email: ''
     };
+      this.events.emit('buyer:changed');
   }
 
   /**

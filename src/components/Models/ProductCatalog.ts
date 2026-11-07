@@ -5,9 +5,10 @@
     protected items: IProduct[] = [];
     protected SelectedProduct: IProduct | null = null;
     constructor(protected events: IEvents) {}
-    
+
     setItems(items: IProduct[]): void {
         this.items = items;
+        this.events.emit('catalog:changed')
     }
 
     getItems(): IProduct[] {
@@ -20,6 +21,7 @@
 
     setSelectedProduct(product: IProduct): void {
         this.SelectedProduct = product;
+        this.events.emit('preview:changed');
     }
 
     getSelectedProduct(): IProduct | null {
