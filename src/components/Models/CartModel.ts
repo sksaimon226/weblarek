@@ -1,8 +1,9 @@
  import { IProduct } from "../../types";
+ import { IEvents } from '../base/Events';
  
  export class CartModel {
   private items: IProduct[] = [];
-
+constructor(protected events: IEvents) {}
   /**
    * Возвращает массив товаров, находящихся в корзине
    * @returns массив товаров

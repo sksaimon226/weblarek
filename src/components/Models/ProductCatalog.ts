@@ -1,9 +1,11 @@
  import { IProduct } from "../../types";
+ import { IEvents } from '../base/Events';
  
  export class ProductCatalog {
     protected items: IProduct[] = [];
     protected SelectedProduct: IProduct | null = null;
-
+    constructor(protected events: IEvents) {}
+    
     setItems(items: IProduct[]): void {
         this.items = items;
     }

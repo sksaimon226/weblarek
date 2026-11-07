@@ -163,3 +163,76 @@ events.on('preview:button-click', () => {
     }
     modal.close();
 });
+
+// Нажата кнопка удаления товара в корзине
+events.on('basket-item:delete-click', (product: IProduct) => {
+    cartmodel.removeItem(product);
+});
+
+// Нажата кнопка открытия корзины
+events.on('basket:open', () => {
+    modal.render({ content: basketView.render() });
+    modal.open();
+});
+
+// Нажата кнопка «Оформить» в корзине
+events.on('basket:order', () => {
+    modal.render({ content: orderForm.render() });
+    modal.open();
+});
+
+// Изменены данные в форме
+events.on('form:change', (data: TFormMod) => {
+    buyerModel.setData(data);
+});
+
+// Отправлена первая форма: переходим ко второй
+events.on('order:submit', () => {
+    modal.render({ content: contactsForm.render() });
+    modal.open();
+});
+
+// Отправлена вторая форма: оформляем заказ на сервере
+events.on('contacts:submit', () => {
+    const order: IOrderRequest = {
+        ...buyerModel.getData(),
+        total: cartmodel.getTotalPrice(),
+        items: cartmodel.getItems().map((item) => item.id),
+    };
+     webLarekApi
+        .sendOrder(order)
+        .then((result) => {
+            cartmodel.clear();
+            buyerModel.clearData();
+            modal.render({ content: success.render({ total: result.total }) });
+            modal.open();
+        })
+        .catch((error) => {
+            console.error('Ошибка оформления заказа', error);
+        });
+});
+
+// Нажата кнопка закрытия сообщения об успешном заказе
+events.on('success:close', () => {
+    modal.close();
+});
+
+// Закрытие модального окна крестиком или кликом вне окна
+events.on('modal:close', () => {
+    modal.close();
+});
+
+// События моделей выполнят начальный рендер счётчика, корзины и форм
+cartmodel.clear();
+buyerModel.clearData();
+
+// ---------- Загрузка каталога с сервера ----------
+webLarekApi
+    .getProducts()
+    .then((data) => {
+        productCatalog.setItems(data.items);
+    
+    })
+    .catch((error) => {
+        console.error('Ошибка загрузки каталога', error);
+    });

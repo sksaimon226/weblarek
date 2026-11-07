@@ -1,5 +1,6 @@
  import { IBuyer } from "../../types";
  import { ValidationErrors } from "../../types";
+ import { IEvents } from '../base/Events';
  
   export class BuyerModel {
   private data: IBuyer = {
@@ -8,7 +9,7 @@
     phone: '',
     email: ''
   };
-
+  constructor(protected events: IEvents) {}
   /**
    * Сохраняет данные покупателя. Может принимать как все поля, так и отдельные.
    * @param partialData - объект с данными покупателя (частичный)
