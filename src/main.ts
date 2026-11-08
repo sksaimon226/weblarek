@@ -20,13 +20,13 @@ import { ContactFormView } from './components/View/ContactFormView';
 import { PayCheckMark } from './components/View/PayCheckMark';
 
 // Шаблоны 
-const CatalogCardTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
-const ModalCardTemplate = ensureElement<HTMLTemplateElement>('#card-preview');
-const CartCardTemplate = ensureElement<HTMLTemplateElement>('#card-basket');
-const CartTemplate = ensureElement<HTMLTemplateElement>('#basket');
+const catalogCardTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
+const modalCardTemplate = ensureElement<HTMLTemplateElement>('#card-preview');
+const cartCardTemplate = ensureElement<HTMLTemplateElement>('#card-basket');
+const cartTemplate = ensureElement<HTMLTemplateElement>('#basket');
 const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
 const contactTemplate = ensureElement<HTMLTemplateElement>('#contacts');
-const CheckMarkTemplate = ensureElement<HTMLTemplateElement>('#success');
+const checkMarkTemplate = ensureElement<HTMLTemplateElement>('#success');
 
 // ---------- Брокер событий, API и модели данных ----------
 const events = new EventEmitter();
@@ -40,16 +40,16 @@ const buyerModel = new BuyerModel(events);
 const header = new Header(events, ensureElement<HTMLElement>('.header'));
 const gallery = new Gallery(ensureElement<HTMLElement>('.gallery'));
 const modal = new Modal(events, ensureElement<HTMLElement>('#modal-container'));
-const cardPreview = new ModalCardView(events, cloneTemplate(ModalCardTemplate));
-const basketView = new Cart(events, cloneTemplate(CartTemplate));
+const cardPreview = new ModalCardView(events, cloneTemplate(modalCardTemplate));
+const basketView = new Cart(events, cloneTemplate(cartTemplate));
 const orderForm = new OrderFormView(events, cloneTemplate<HTMLFormElement>(orderTemplate));
 const contactsForm = new ContactFormView(events, cloneTemplate<HTMLFormElement>(contactTemplate));
-const success = new PayCheckMark(events, cloneTemplate(CheckMarkTemplate));
+const success = new PayCheckMark(events, cloneTemplate(checkMarkTemplate));
 
 // Карточки товаров в корзине
 function getBasketCards(): HTMLElement[] {
     return cartmodel.getItems().map((item, index) => {
-        const card = new CartCardView(cloneTemplate(CartCardTemplate), {
+        const card = new CartCardView(cloneTemplate(cartCardTemplate), {
             onClick: () => events.emit('basket-item:delete-click', item),
         });
         return card.render({ title: item.title, price: item.price, index: index + 1 });
@@ -92,7 +92,7 @@ function getContactsFormData(): TContactFormView {
 // Изменился каталог: выводим карточки на главной странице
 events.on('catalog:changed', () => {
     const cards = productCatalog.getItems().map((item) => {
-        const card = new CatalogCardView(cloneTemplate(CatalogCardTemplate), {
+        const card = new CatalogCardView(cloneTemplate(catalogCardTemplate), {
             onClick: () => events.emit('card:select', item),
         });
         return card.render({
